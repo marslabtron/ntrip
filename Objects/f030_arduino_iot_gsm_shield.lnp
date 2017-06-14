@@ -1,0 +1,13 @@
+--cpu Cortex-M0
+".\objects\main.o"
+".\objects\stm32f0xx_flash.o"
+".\objects\stm32f0xx_gpio.o"
+".\objects\stm32f0xx_misc.o"
+".\objects\stm32f0xx_rcc.o"
+".\objects\stm32f0xx_usart.o"
+".\objects\startup_stm32f030x8.o"
+".\objects\system_stm32f0xx.o"
+--strict --scatter ".\Objects\f030_arduino_iot_gsm_shield.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\f030_arduino_iot_gsm_shield.map" -o .\Objects\f030_arduino_iot_gsm_shield.axf
