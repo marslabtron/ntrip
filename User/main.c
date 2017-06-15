@@ -246,7 +246,7 @@ void UART2_send_string(char* data)
 		UART2_send_byte(*data++);
 	}
 }
-void gprs_setup_connection()
+void gprs_setup_connection(qxwz_soc_address address)
 {
 	gprs_step=1;
 	while(gprs_step<7)
@@ -308,7 +308,9 @@ void gprs_setup_connection()
 			if(buff_find(gprs_rx,gprs_rxi,"\r\r\nOK\r\n",7)<0)
 			{
 				gprs_rxi=0;
-				UART2_send_string("AT+QIOPEN=\"TCP\",\"123.123.123.123\",6006\r\n");
+                                uint8_t temp_buf[100];
+                                sprintf(temp_buf, "AT+QIOPEN=\"TCP\",\"%s\",%d\r\n", address.hostName, address.port);
+				UART2_send_string(temp_buf);
 			}
 			else
 			{
@@ -382,12 +384,12 @@ qxwz_soc qxwz_soc_create(void)
 //    return -1;
 //  }
     //qxwz_soc_init();
-  gprs_setup_connection();
+  //gprs_setup_connection();
 }
 
 int8_t qxwz_soc_connect(qxwz_soc soc,qxwz_soc_address address)
 {
-  
+  gprs_setup_connection(address);
 }
 
 qxwz_ssize_t qxwz_soc_send(qxwz_soc soc,char *send_buffer,size_t length)
@@ -442,7 +444,7 @@ int8_t qxwz_soc_init(void)
 //  }
 //  else 
 //    return 1;
-    gprs_setup_connection();
+    //gprs_setup_connection();
     return 0;
 }
        
@@ -453,13 +455,19 @@ static int8_t init_GPRS(void)
 
 int main()
 {
+        qxwz_config config;
         qxwz_soc sockfd;
-	qxwz_soc_address address;
+	qxwz_soc_address qxwz_server_address;
+        qxwz_server_address.hostName = "60.205.8.49";
+        qxwz_server_address.port = 8002;
 	 
-	config.appkey = "";
-	config.appsecret = "";
-	config.device_ID = "";
-	config.device_Type = "";
+	config.appkey = "testbob001";
+	config.appsecret = "9692e90";
+	config.device_ID = "STM32F0";
+	config.device_Type = "Test_device";
+        
+        //qxwz_setting(&config);
+        
 	SysTick_Config(48000);
 	
 	GPIO_init();
@@ -473,8 +481,10 @@ int main()
 	GPIO_SetBits(GPIOB,GPIO_Pin_13);//SYS
 	
 	//gprs_setup_connection();
-        qxwz_soc_create();
-	
+        //qxwz_soc_create();
+	qxwz_soc_connect(1, qxwz_server_address);
+        
+        
 	while(1)
 	{
 		send_steps("hello\r\n",7);
